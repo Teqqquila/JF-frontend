@@ -3,6 +3,7 @@ import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models/base-ite
 import { CollectionType } from '@jellyfin/sdk/lib/generated-client/models/collection-type';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Favorite from '@mui/icons-material/Favorite';
+import Star from '@mui/icons-material/Star';
 import Button from '@mui/material/Button/Button';
 import Icon from '@mui/material/Icon';
 import { Theme } from '@mui/material/styles';
@@ -72,7 +73,7 @@ const UserViewNav = () => {
 
         const customLinks = (webConfig.menuLinks || []).length;
 
-        return _maxViews - customLinks;
+        return _maxViews - customLinks - 1;
     }, [ isExtraLargeScreen, isLargeScreen, webConfig.menuLinks ]);
 
     const { user } = useApi();
@@ -124,6 +125,18 @@ const UserViewNav = () => {
                 to='/home?tab=1'
             >
                 {globalize.translate(MetaView.Favorites.Name)}
+            </Button>
+
+            <Button
+                variant='text'
+                color='inherit'
+                startIcon={<Star />}
+                component='a'
+                href='http://129.114.25.107:30089/'
+                target='_blank'
+                rel='noopener noreferrer'
+            >
+                Recommend
             </Button>
 
             {webConfig.menuLinks?.map(link => (
