@@ -4,6 +4,8 @@ import 'elements/emby-button/emby-button';
 
 // eslint-disable-next-line sonarjs/no-clear-text-protocols
 const REC_API_BASE = 'http://129.114.25.107:30089';
+const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNjM1ZjliMDM0YTM1OGUyNDVmMGNiYmFjM2I1MzJjMyIsIm5iZiI6MTc3NzI2NDcyNi41MzUsInN1YiI6IjY5ZWVlODU2NjBiYmYwOTkxNDAyOThlOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.iNQVVxrQwXRo9qPNeRP-EE9_Hz5pc2dAIiWg9JA2qq0';
+const TMDB_IMG_BASE = 'https://image.tmdb.org/t/p/w300';
 
 export default function (view) {
     const grid = view.querySelector('.recGrid');
@@ -13,8 +15,14 @@ export default function (view) {
     const topNSelect = view.querySelector('.recTopNSelect');
     const refreshBtn = view.querySelector('.recRefreshBtn');
     const adminBtn = view.querySelector('.recAdminBtn');
+    const syncBtn = view.querySelector('.recSyncBtn');
+    const syncBar = view.querySelector('.recSyncBar');
+    const syncCount = view.querySelector('.recSyncCount');
+    const syncProgress = view.querySelector('.recSyncProgress');
+    const syncDetail = view.querySelector('.recSyncDetail');
     const movieSearchInput = view.querySelector('.recMovieSearchInput');
     const movieSearchResults = view.querySelector('.recMovieSearchResults');
+    const movieIdDirectInput = view.querySelector('.recMovieIdDirectInput');
     const selectedMovieLabel = view.querySelector('.recSelectedMovieLabel');
     const durationInput = view.querySelector('.recDurationInput');
     const submitPrefBtn = view.querySelector('.recSubmitPrefBtn');
@@ -82,6 +90,31 @@ export default function (view) {
             });
     }
 
+    function fetchTmdbPoster(card, rawTitle) {
+        const yearMatch = rawTitle.match(/\((\d{4})\)\s*$/);
+        const year = yearMatch ? yearMatch[1] : '';
+        const query = rawTitle.replace(/\s*\(\d{4}\)\s*$/, '').trim();
+
+        fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&year=${year}&language=en-US&page=1`, {
+            headers: { 'Authorization': `Bearer ${TMDB_TOKEN}` }
+        })
+            .then(r => r.json())
+            .then(data => {
+                const hit = data.results && data.results[0];
+                if (!hit || !hit.poster_path) return;
+                const img = card.querySelector('.recPosterImg');
+                const fallback = card.querySelector('.recPosterFallback');
+                if (!img) return;
+                img.onload = () => {
+                    img.style.display = 'block';
+                    if (fallback) fallback.style.display = 'none';
+                };
+                img.onerror = () => {};
+                img.src = `${TMDB_IMG_BASE}${hit.poster_path}`;
+            })
+            .catch(() => {});
+    }
+
     function renderRecommendations(recs) {
         grid.innerHTML = '';
         recs.forEach((rec, i) => {
@@ -110,14 +143,12 @@ export default function (view) {
                 card.style.boxShadow = 'none';
             };
 
-            const posterHtml = posterUrl ?
-                `<div style="position:relative; width:100%; aspect-ratio: 2/3; background:#111; flex-shrink:0;">
-                       <img src="${escapeHtml(posterUrl)}" alt="${escapeHtml(title)}"
-                            style="width:100%; height:100%; object-fit: cover; display:block;"
-                            onerror="this.parentElement.querySelector('.recPosterFallback').style.display='flex'; this.style.display='none';">
-                       <div class="recPosterFallback" style="display:none; position:absolute; inset:0; background:linear-gradient(135deg,#1f2a3f,#0a1421); align-items:center; justify-content:center; font-size:2.4em;">🎬</div>
-                   </div>` :
-                '<div style="width:100%; aspect-ratio: 2/3; background:linear-gradient(135deg,#1f2a3f,#0a1421); display:flex; align-items:center; justify-content:center; font-size:2.4em; flex-shrink:0;">🎬</div>';
+            const posterHtml = `
+                <div style="position:relative; width:100%; aspect-ratio: 2/3; background:#111; flex-shrink:0;">
+                    <img class="recPosterImg" src="${escapeHtml(posterUrl)}" alt="${escapeHtml(title)}"
+                         style="width:100%; height:100%; object-fit:cover; display:${posterUrl ? 'block' : 'none'};">
+                    <div class="recPosterFallback" style="display:${posterUrl ? 'none' : 'flex'}; position:absolute; inset:0; background:linear-gradient(135deg,#1f2a3f,#0a1421); align-items:center; justify-content:center; font-size:2.4em;">🎬</div>
+                </div>`;
 
             card.innerHTML = `
                 ${posterHtml}
@@ -151,6 +182,7 @@ export default function (view) {
             });
 
             grid.appendChild(card);
+            setTimeout(() => fetchTmdbPoster(card, title), i * 50);
         });
     }
 
@@ -250,29 +282,40 @@ export default function (view) {
             });
     }
 
-    movieSearchInput.addEventListener('input', () => {
-        selectedMovieId = null;
-        selectedMovieLabel.textContent = '';
-        clearTimeout(searchDebounceTimer);
-        searchDebounceTimer = setTimeout(() => searchMovies(movieSearchInput.value.trim()), 280);
-    });
-
     document.addEventListener('click', e => {
         if (!movieSearchResults.contains(e.target) && e.target !== movieSearchInput) {
             movieSearchResults.style.display = 'none';
         }
     });
 
+    // When search selects a movie, also fill the direct ID box
+    movieSearchInput.addEventListener('input', () => {
+        selectedMovieId = null;
+        selectedMovieLabel.textContent = '';
+        movieIdDirectInput.value = '';
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => searchMovies(movieSearchInput.value.trim()), 280);
+    });
+
+    // When user types directly in the ID box, clear search selection
+    movieIdDirectInput.addEventListener('input', () => {
+        selectedMovieId = null;
+        selectedMovieLabel.textContent = '';
+        movieSearchInput.value = '';
+        movieSearchResults.style.display = 'none';
+    });
+
     function handleSubmitPreference() {
         prefStatus.style.color = '';
         prefStatus.textContent = '';
 
+        // Prefer search-selected ID, fall back to direct input
+        const movieId = selectedMovieId || movieIdDirectInput.value.trim();
         const duration = durationInput.value.trim();
 
-        if (!selectedMovieId) {
+        if (!movieId) {
             prefStatus.style.color = '#ff6b6b';
-            prefStatus.textContent = 'Search and select a movie first';
-            movieSearchInput.focus();
+            prefStatus.textContent = 'Search a movie title or enter a Movie ID';
             return;
         }
 
@@ -296,7 +339,7 @@ export default function (view) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 user_id: currentNumericUserId,
-                movie_id: String(selectedMovieId),
+                movie_id: String(movieId),
                 watch_duration_seconds: parseInt(duration, 10)
             })
         })
@@ -313,6 +356,7 @@ export default function (view) {
                 prefStatus.style.color = '#2ecc71';
                 prefStatus.textContent = '✓ Submitted! Refresh to see updated recommendations.';
                 movieSearchInput.value = '';
+                movieIdDirectInput.value = '';
                 selectedMovieId = null;
                 selectedMovieLabel.textContent = '';
                 durationInput.value = '';
@@ -323,6 +367,119 @@ export default function (view) {
             .catch(err => {
                 prefStatus.style.color = '#ff6b6b';
                 prefStatus.textContent = `Error: ${err.message}`;
+            });
+    }
+
+    // ── Sync Jellyfin watch history → recommendation system ──
+    function handleSyncWatchHistory() {
+        if (currentNumericUserId == null) {
+            status.textContent = 'Load recommendations first before syncing.';
+            return;
+        }
+
+        const apiClient = ServerConnections.currentApiClient();
+        syncBtn.disabled = true;
+        syncBar.style.display = 'block';
+        syncDetail.textContent = 'Fetching Jellyfin watch history…';
+        syncCount.textContent = '';
+        syncProgress.style.width = '0%';
+
+        apiClient.getCurrentUser()
+            .then(user => {
+                const baseParams = {
+                    IncludeItemTypes: 'Movie',
+                    Recursive: true,
+                    Fields: 'UserData,RunTimeTicks,ProductionYear',
+                    Limit: 500
+                };
+                return Promise.all([
+                    apiClient.getItems(user.Id, { ...baseParams, Filters: 'IsPlayed' }),
+                    apiClient.getItems(user.Id, { ...baseParams, Filters: 'IsResumable' })
+                ]);
+            })
+            .then(([playedResp, resumableResp]) => {
+                const seen = new Set();
+                const items = [...(playedResp.Items || []), ...(resumableResp.Items || [])]
+                    .filter(item => {
+                        if (seen.has(item.Id)) return false;
+                        seen.add(item.Id);
+                        return item.UserData && (
+                            item.UserData.Played === true ||
+                            item.UserData.PlaybackPositionTicks > 0
+                        );
+                    });
+                if (!items.length) {
+                    syncDetail.textContent = 'No watched movies found in Jellyfin library.';
+                    syncBtn.disabled = false;
+                    return;
+                }
+
+                let done = 0;
+                let matched = 0;
+                const total = items.length;
+                syncCount.textContent = `0 / ${total}`;
+
+                // Process one at a time to avoid flooding the API
+                function processNext(idx) {
+                    if (idx >= total) {
+                        syncProgress.style.width = '100%';
+                        syncDetail.textContent = `Done — ${matched} / ${total} movies matched and submitted.`;
+                        syncCount.textContent = `${matched} matched`;
+                        syncBtn.disabled = false;
+                        setTimeout(() => {
+                            syncBar.style.display = 'none';
+                        }, 5000);
+                        return;
+                    }
+
+                    const item = items[idx];
+                    const title = item.Name || '';
+                    const year = item.ProductionYear || '';
+                    const positionTicks = item.UserData.PlaybackPositionTicks || 0;
+                    const durationTicks = positionTicks > 0 ? positionTicks : (item.RunTimeTicks || 0);
+                    const watchSec = Math.floor(durationTicks / 10000000);
+
+                    syncDetail.textContent = `Matching: ${title} (${year})`;
+
+                    fetch(`${REC_API_BASE}/api/search?q=${encodeURIComponent(title)}&limit=5`)
+                        .then(r => r.json())
+                        .then(data => {
+                            const results = data.results || [];
+                            // Match by title containing the year
+                            const hit = results.find(r2 =>
+                                year ? r2.title.includes(`(${year})`) : results[0]
+                            ) || results[0];
+
+                            if (hit && watchSec > 60) {
+                                matched++;
+                                /* eslint-disable @typescript-eslint/naming-convention */
+                                return fetch(`${REC_API_BASE}/api/ingest-event`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        user_id: currentNumericUserId,
+                                        movie_id: String(hit.movie_id),
+                                        watch_duration_seconds: watchSec
+                                    })
+                                /* eslint-enable @typescript-eslint/naming-convention */
+                                }).then(r => r.json());
+                            }
+                        })
+                        .catch(err => console.debug('[sync] no match:', err))
+                        .finally(() => {
+                            done++;
+                            syncCount.textContent = `${done} / ${total}`;
+                            syncProgress.style.width = `${Math.round((done / total) * 100)}%`;
+                            // Small delay to avoid hammering APIs
+                            setTimeout(() => processNext(idx + 1), 120);
+                        });
+                }
+
+                processNext(0);
+            })
+            .catch(err => {
+                syncDetail.textContent = `Error: ${err.message}`;
+                syncBtn.disabled = false;
             });
     }
 
@@ -343,6 +500,7 @@ export default function (view) {
         window.location.href = '#/recommend/admin';
     });
     submitPrefBtn.addEventListener('click', handleSubmitPreference);
+    syncBtn.addEventListener('click', handleSyncWatchHistory);
 
     view.addEventListener('viewshow', function () {
         loadCurrentUser()

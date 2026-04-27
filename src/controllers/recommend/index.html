@@ -10,9 +10,26 @@
                     <div class="recUserBadge" style="font-size: 0.78em; opacity: 0.55; margin-top: 3px;"></div>
                 </div>
             </div>
-            <button is="emby-button" type="button" class="recAdminBtn raised" style="border-radius: 20px;">
-                <span>⚙ Model Management</span>
-            </button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <button is="emby-button" type="button" class="recSyncBtn raised" style="border-radius: 20px; background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.4);">
+                    <span>⟳ Sync Watch History</span>
+                </button>
+                <button is="emby-button" type="button" class="recAdminBtn raised" style="border-radius: 20px;">
+                    <span>⚙ Model Management</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Sync status bar (hidden until syncing) ── -->
+        <div class="recSyncBar" style="display: none; margin-bottom: 1em; padding: 0.8em 1.2em; background: rgba(46,204,113,0.08); border-radius: 10px; border: 1px solid rgba(46,204,113,0.25); font-size: 0.85em;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4em;">
+                <span style="color: #2ecc71; font-weight: 600;">Syncing Jellyfin Watch History</span>
+                <span class="recSyncCount" style="opacity: 0.6;"></span>
+            </div>
+            <div style="background: rgba(255,255,255,0.08); border-radius: 4px; height: 4px; overflow: hidden;">
+                <div class="recSyncProgress" style="height: 100%; background: #2ecc71; width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+            <div class="recSyncDetail" style="opacity: 0.55; margin-top: 0.4em; font-size: 0.88em;"></div>
         </div>
 
         <!-- ── Controls row ── -->
@@ -43,20 +60,28 @@
         <!-- ── Submit Preference ── -->
         <div style="margin-bottom: 1.2em; padding: 0.9em 1.4em; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(106,90,205,0.35);">
             <div style="font-size: 0.78em; font-weight: 600; letter-spacing: 0.5px; color: #a990ff; margin-bottom: 0.6em;">SUBMIT PREFERENCE</div>
-            <!-- Single row: search | duration | submit | status -->
             <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                <!-- Search box with dropdown -->
                 <div style="position: relative; flex: 2; min-width: 180px;">
                     <input type="text" class="recMovieSearchInput emby-input" placeholder="Search movie title…" style="width: 100%; border-radius: 8px;" autocomplete="off">
                     <div class="recMovieSearchResults"
                          style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1a1a2e; border: 1px solid rgba(106,90,205,0.5); border-radius: 8px; max-height: 220px; overflow-y: auto; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
                     </div>
                 </div>
-                <span class="recSelectedMovieLabel" style="font-size: 0.75em; color: #a990ff; white-space: nowrap;"></span>
-                <input type="number" class="recDurationInput emby-input" placeholder="Duration (sec)" style="width: 140px; border-radius: 8px;" min="1" max="20000">
+                <!-- Divider -->
+                <span style="font-size: 0.75em; opacity: 0.35; flex-shrink: 0;">or</span>
+                <!-- Direct Movie ID input -->
+                <input type="number" class="recMovieIdDirectInput emby-input" placeholder="Movie ID" style="width: 100px; border-radius: 8px;" min="1" max="290000">
+                <!-- Duration -->
+                <input type="number" class="recDurationInput emby-input" placeholder="Duration (sec)" style="width: 130px; border-radius: 8px;" min="1" max="86400">
+                <!-- Submit -->
                 <button is="emby-button" type="button" class="recSubmitPrefBtn raised button-submit" style="border-radius: 8px; white-space: nowrap; flex-shrink: 0;">
                     <span>Submit</span>
                 </button>
                 <span class="recPrefStatus" style="font-size: 0.82em;"></span>
+            </div>
+            <div style="margin-top: 5px; min-height: 1.1em;">
+                <span class="recSelectedMovieLabel" style="font-size: 0.75em; color: #a990ff;"></span>
             </div>
         </div>
 

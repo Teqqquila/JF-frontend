@@ -43,7 +43,7 @@ function renderHeader() {
     html += '<h3 class="pageTitle" aria-hidden="true"></h3>';
     html += '</div>';
     html += '<div class="headerRight">';
-    html += '<a href="http://129.114.25.107:30089/" target="_blank" class="headerButton headerButtonRight" style="color:#00a4dc;font-size:14px;text-decoration:none;font-weight:bold;display:flex;align-items:center;padding:0 10px;">⭐ Recommend</a>';
+    html += '<a href="#/recommend" class="headerButton headerButtonRight" style="color:#00a4dc;font-size:14px;text-decoration:none;font-weight:bold;display:flex;align-items:center;padding:0 10px;">⭐ Recommend</a>';
     html += '<button is="paper-icon-button-light" class="headerSyncButton syncButton headerButton headerButtonRight hide"><span class="material-icons groups" aria-hidden="true"></span></button>';
     html += '<span class="headerSelectedPlayer"></span>';
     html += '<button is="paper-icon-button-light" class="headerAudioPlayerButton audioPlayerButton headerButton headerButtonRight hide"><span class="material-icons music_note" aria-hidden="true"></span></button>';
