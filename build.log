@@ -1,0 +1,94 @@
+
+> jellyfin-web@10.12.0 build:production
+> cross-env NODE_ENV="production" webpack --config webpack.prod.js
+
+[BABEL] Note: The code generator has deoptimised the styling of /home/cc/jellyfin-web/node_modules/pdfjs-dist/build/pdf.js as it exceeds the max of 500KB.
+assets by info 41.7 MiB [immutable] 2195 assets
+assets by path assets/ 48 KiB 28 assets
+assets by path themes/ 148 KiB 16 assets
+assets by path libraries/ 8.98 MiB
+  assets by path libraries/*.js 5.71 MiB 6 assets
+  assets by path libraries/*.wasm 3.13 MiB 2 assets
+  + 1 asset
+assets by path favicons/*.png 49.7 KiB
+  asset favicons/touchicon512.png 25.1 KiB [emitted] [from: ../node_modules/@jellyfin/ux-web/favicons/touchicon512.png] [copied]
+  asset favicons/touchicon.png 8.32 KiB [emitted] [from: ../node_modules/@jellyfin/ux-web/favicons/touchicon.png] [copied]
+  + 3 assets
+assets by path *.json 1.83 KiB
+  asset config.json 1.04 KiB [emitted] [from: config.json] [copied]
+  asset manifest.json 812 bytes [emitted] [from: manifest.json]
++ 33 assets
+orphan modules 9.22 MiB (javascript) 24.5 MiB (asset) 96.1 KiB (runtime) [orphan] 3369 modules
+runtime modules 55.6 KiB 15 modules
+built modules 26.9 MiB (javascript) 1.38 MiB (css/mini-extract) 46.9 KiB (asset) [built]
+  modules by path ../node_modules/ 15.8 MiB (javascript) 155 KiB (css/mini-extract) 23 KiB (asset)
+    javascript modules 15.8 MiB 2257 modules
+    json modules 30 KiB 4 modules
+    css modules 155 KiB 3 modules
+    + 1 module
+  modules by path ./ 11.1 MiB (javascript) 1.23 MiB (css/mini-extract) 23.9 KiB (asset)
+    javascript modules 4.41 MiB 480 modules
+    json modules 6.69 MiB 107 modules
+    css modules 1.23 MiB 93 modules
+    asset modules 23.9 KiB (asset) 84 bytes (javascript) 2 modules
+  + 6 modules
+
+WARNING in asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+This can impact web performance.
+Assets: 
+  MaterialIcons-Regular.698bd8550d863c20a3e1.ttf (339 KiB)
+  main.jellyfin.bundle.js (489 KiB)
+  node_modules.@jellyfin.sdk.bundle.js (694 KiB)
+  node_modules.@mui.material.bundle.js (724 KiB)
+  libraries/libarchive.wasm (979 KiB)
+  libraries/subtitles-octopus-worker.js (352 KiB)
+  libraries/subtitles-octopus-worker.wasm (2.18 MiB)
+  libraries/subtitles-octopus-worker-legacy.js (4.25 MiB)
+  libraries/pdf.worker.js (1 MiB)
+  73560.49e7c92878ed0bb4fad6.css (996 KiB)
+  ta-json.93441609729cbac071aa.chunk.js (251 KiB)
+  te-json.20cfb249ca4116990072.chunk.js (244 KiB)
+  node_modules.@mui.x-date-pickers.49eb19ef4075df2cc870.chunk.js (269 KiB)
+  node_modules.hls.js.d1fbdb00c8f7e5cc7cb8.chunk.js (528 KiB)
+  node_modules.pdfjs-dist.b983b688d208acfb7ec1.chunk.js (414 KiB)
+
+WARNING in entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+Entrypoints:
+  main.jellyfin (3.26 MiB)
+      runtime.bundle.js
+      node_modules.@jellyfin.sdk.bundle.js
+      node_modules.@mui.material.bundle.js
+      node_modules.@mui.icons-material.bundle.js
+      node_modules.@mui.system.bundle.js
+      node_modules.@mui.utils.bundle.js
+      node_modules.lodash-es.bundle.js
+      node_modules.date-fns.esm.bundle.js
+      node_modules.react-transition-group.bundle.js
+      node_modules.core-js.bundle.js
+      node_modules.@popperjs.core.bundle.js
+      node_modules.axios.bundle.js
+      node_modules.@tanstack.query-core.bundle.js
+      node_modules.@tanstack.react-query.bundle.js
+      node_modules.react-dom.bundle.js
+      node_modules.jquery.bundle.js
+      node_modules.webcomponents.js.bundle.js
+      node_modules.resize-observer-polyfill.bundle.js
+      node_modules.regenerator-runtime.bundle.js
+      node_modules.jellyfin-apiclient.bundle.js
+      node_modules.intersection-observer.bundle.js
+      node_modules.history.bundle.js
+      node_modules.dompurify.bundle.js
+      node_modules.react-router.bundle.js
+      node_modules.react-router-dom.bundle.js
+      node_modules.@remix-run.router.bundle.js
+      node_modules.abortcontroller-polyfill.bundle.js
+      37052.bundle.js
+      37052.03edf3bb7ee048ee10be.css
+      main.jellyfin.bundle.js
+      main.jellyfin.531d16f3e53182483f0c.css
+  serviceworker (261 KiB)
+      runtime.bundle.js
+      node_modules.core-js.bundle.js
+      serviceworker.js
+
+webpack 5.105.4 compiled with 2 warnings in 187519 ms
