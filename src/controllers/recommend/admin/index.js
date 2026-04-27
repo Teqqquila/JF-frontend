@@ -1,42 +1,42 @@
 import 'elements/emby-select/emby-select';
 import 'elements/emby-button/emby-button';
 
+// eslint-disable-next-line sonarjs/no-clear-text-protocols
 const REC_API_BASE = 'http://129.114.25.107:30089';
 
 export default function (view) {
-    // ── DOM refs ──
-    const metricVersion  = view.querySelector('.adminMetricVersion');
-    const metricMse      = view.querySelector('.adminMetricMse');
-    const metricHitRate  = view.querySelector('.adminMetricHitRate');
-    const metricNdcg     = view.querySelector('.adminMetricNdcg');
-    const trainingBadge  = view.querySelector('.adminTrainingBadge');
+    const metricVersion = view.querySelector('.adminMetricVersion');
+    const metricMse = view.querySelector('.adminMetricMse');
+    const metricHitRate = view.querySelector('.adminMetricHitRate');
+    const metricNdcg = view.querySelector('.adminMetricNdcg');
+    const trainingBadge = view.querySelector('.adminTrainingBadge');
 
-    const datasetSelect    = view.querySelector('.adminDatasetSelect');
-    const modelTypeSelect  = view.querySelector('.adminModelTypeSelect');
-    const retrainBtn       = view.querySelector('.adminRetrainBtn');
-    const retrainBtn2      = view.querySelector('.adminRetrainBtn2');
-    const retrainStatus    = view.querySelector('.adminRetrainStatus');
+    const datasetSelect = view.querySelector('.adminDatasetSelect');
+    const modelTypeSelect = view.querySelector('.adminModelTypeSelect');
+    const retrainBtn = view.querySelector('.adminRetrainBtn');
+    const retrainBtn2 = view.querySelector('.adminRetrainBtn2');
+    const retrainStatus = view.querySelector('.adminRetrainStatus');
 
-    const logBox        = view.querySelector('.adminLogBox');
-    const clearLogsBtn  = view.querySelector('.adminClearLogsBtn');
+    const logBox = view.querySelector('.adminLogBox');
+    const clearLogsBtn = view.querySelector('.adminClearLogsBtn');
 
-    const historyList   = view.querySelector('.adminHistoryList');
+    const historyList = view.querySelector('.adminHistoryList');
 
-    const scheduleEnabled      = view.querySelector('.adminScheduleEnabled');
+    const scheduleEnabled = view.querySelector('.adminScheduleEnabled');
     const scheduleEnabledLabel = view.querySelector('.adminScheduleEnabledLabel');
-    const scheduleInterval     = view.querySelector('.adminScheduleInterval');
-    const scheduleTime         = view.querySelector('.adminScheduleTime');
-    const saveScheduleBtn      = view.querySelector('.adminSaveScheduleBtn');
-    const scheduleStatus       = view.querySelector('.adminScheduleStatus');
+    const scheduleInterval = view.querySelector('.adminScheduleInterval');
+    const scheduleTime = view.querySelector('.adminScheduleTime');
+    const saveScheduleBtn = view.querySelector('.adminSaveScheduleBtn');
+    const scheduleStatus = view.querySelector('.adminScheduleStatus');
 
     const backBtn = view.querySelector('.adminBackBtn');
 
     let pollTimer = null;
 
-    // ── Navigation ──
-    backBtn.addEventListener('click', () => { window.location.href = '#/recommend'; });
+    backBtn.addEventListener('click', () => {
+        window.location.href = '#/recommend';
+    });
 
-    // ── ① Overview / Status ──
     function loadStatus() {
         return fetch(`${REC_API_BASE}/api/status`)
             .then(r => r.json())
@@ -44,9 +44,9 @@ export default function (view) {
                 const m = data.current_model;
                 if (m) {
                     metricVersion.textContent = m.run_name || m.data_version || '--';
-                    metricMse.textContent     = m.metrics.best_val_mse  ? m.metrics.best_val_mse.toFixed(4)                  : '--';
-                    metricHitRate.textContent = m.metrics.hit_rate_10   ? (m.metrics.hit_rate_10 * 100).toFixed(1) + '%'     : '--';
-                    metricNdcg.textContent    = m.metrics.ndcg_10       ? m.metrics.ndcg_10.toFixed(4)                       : '--';
+                    metricMse.textContent = m.metrics.best_val_mse ? m.metrics.best_val_mse.toFixed(4) : '--';
+                    metricHitRate.textContent = m.metrics.hit_rate_10 ? (m.metrics.hit_rate_10 * 100).toFixed(1) + '%' : '--';
+                    metricNdcg.textContent = m.metrics.ndcg_10 ? m.metrics.ndcg_10.toFixed(4) : '--';
                 }
                 updateBadge(data.training_status);
             })
@@ -55,17 +55,26 @@ export default function (view) {
 
     function updateBadge(status) {
         const training = status === 'training';
-        const error    = status === 'error';
-        trainingBadge.style.background = training ? 'rgba(0,164,220,0.15)' : error ? 'rgba(231,76,60,0.15)' : 'rgba(46,204,113,0.15)';
-        trainingBadge.style.color      = training ? '#00a4dc' : error ? '#e74c3c' : '#2ecc71';
-        trainingBadge.textContent      = training ? '● Training…' : error ? '● Error' : '● Ready';
+        const isError = status === 'error';
+        if (training) {
+            trainingBadge.style.background = 'rgba(0,164,220,0.15)';
+            trainingBadge.style.color = '#00a4dc';
+            trainingBadge.textContent = '● Training…';
+        } else if (isError) {
+            trainingBadge.style.background = 'rgba(231,76,60,0.15)';
+            trainingBadge.style.color = '#e74c3c';
+            trainingBadge.textContent = '● Error';
+        } else {
+            trainingBadge.style.background = 'rgba(46,204,113,0.15)';
+            trainingBadge.style.color = '#2ecc71';
+            trainingBadge.textContent = '● Ready';
+        }
         [retrainBtn, retrainBtn2].forEach(btn => {
             if (!btn) return;
             btn.disabled = training;
         });
     }
 
-    // ── ② Datasets ──
     function loadDatasets() {
         return fetch(`${REC_API_BASE}/api/datasets`)
             .then(r => r.json())
@@ -86,9 +95,8 @@ export default function (view) {
             });
     }
 
-    // ── Retrain ──
     function doRetrain() {
-        const version   = datasetSelect.value;
+        const version = datasetSelect.value;
         const baseModel = modelTypeSelect.value;
 
         if (!version || version.startsWith('No datasets') || version.startsWith('Error')) {
@@ -125,7 +133,6 @@ export default function (view) {
     retrainBtn.addEventListener('click', doRetrain);
     retrainBtn2.addEventListener('click', doRetrain);
 
-    // ── ③ Logs ──
     function loadLogs() {
         return fetch(`${REC_API_BASE}/api/logs`)
             .then(r => r.json())
@@ -134,11 +141,11 @@ export default function (view) {
                 if (!logs.length) return;
                 logBox.innerHTML = logs.map((line, i) => {
                     let color = 'rgba(255,255,255,0.6)';
-                    if (/error|failed/i.test(line))               color = '#e74c3c';
+                    if (/error|failed/i.test(line)) color = '#e74c3c';
                     else if (/complete|done|success|new best/i.test(line)) color = '#2ecc71';
-                    else if (/epoch/i.test(line))                 color = '#00a4dc';
+                    else if (/epoch/i.test(line)) color = '#00a4dc';
                     return `<div style="color:${color}; white-space: pre-wrap; word-break: break-all;">`
-                        + `<span style="color:rgba(255,255,255,0.22);">[${String(i).padStart(2,'0')}]</span> `
+                        + `<span style="color:rgba(255,255,255,0.22);">[${String(i).padStart(2, '0')}]</span> `
                         + escHtml(line) + '</div>';
                 }).join('');
                 logBox.scrollTop = logBox.scrollHeight;
@@ -164,12 +171,16 @@ export default function (view) {
     }
 
     function stopPollingLogs() {
-        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+        }
     }
 
-    clearLogsBtn.addEventListener('click', () => { logBox.innerHTML = ''; });
+    clearLogsBtn.addEventListener('click', () => {
+        logBox.innerHTML = '';
+    });
 
-    // ── ④ History ──
     function loadHistory() {
         return fetch(`${REC_API_BASE}/api/history`)
             .then(r => r.json())
@@ -180,24 +191,24 @@ export default function (view) {
                     return;
                 }
                 historyList.innerHTML = runs.map((r, i) => {
-                    const name   = escHtml(r.run_name || r.data_version || '--');
-                    const dv     = escHtml(r.data_version || '--');
-                    const time   = escHtml(r.start_time || '--');
-                    const mse    = r.metrics.best_val_mse  ? r.metrics.best_val_mse.toFixed(4)                : '--';
-                    const hr     = r.metrics.hit_rate_10   ? (r.metrics.hit_rate_10 * 100).toFixed(1) + '%'  : '--';
-                    const ndcg   = r.metrics.ndcg_10       ? r.metrics.ndcg_10.toFixed(4)                    : '--';
+                    const name = escHtml(r.run_name || r.data_version || '--');
+                    const dv = escHtml(r.data_version || '--');
+                    const time = escHtml(r.start_time || '--');
+                    const mse = r.metrics.best_val_mse ? r.metrics.best_val_mse.toFixed(4) : '--';
+                    const hr = r.metrics.hit_rate_10 ? (r.metrics.hit_rate_10 * 100).toFixed(1) + '%' : '--';
+                    const ndcg = r.metrics.ndcg_10 ? r.metrics.ndcg_10.toFixed(4) : '--';
                     const isLast = i === 0;
-                    const mlflowLink = r.mlflow_url
-                        ? `<a href="${escHtml(r.mlflow_url)}" target="_blank"
-                               style="font-size:0.82em; color:#00a4dc; text-decoration:none; padding:4px 10px; border:1px solid #00a4dc; border-radius:4px;">MLflow ↗</a>`
-                        : '';
-                    const rollbackBtn = !isLast
-                        ? `<button class="adminRollbackBtn"
+                    const mlflowLink = r.mlflow_url ?
+                        `<a href="${escHtml(r.mlflow_url)}" target="_blank"
+                               style="font-size:0.82em; color:#00a4dc; text-decoration:none; padding:4px 10px; border:1px solid #00a4dc; border-radius:4px;">MLflow ↗</a>` :
+                        '';
+                    const rollbackBtn = !isLast ?
+                        `<button class="adminRollbackBtn"
                                     data-version="${escHtml(r.data_version || r.run_name || '')}"
                                     style="font-size:0.82em; padding:4px 12px; border:1px solid rgba(243,156,18,0.6); border-radius:4px; background:transparent; color:rgba(243,156,18,0.9); cursor:pointer;">
                                Rollback
-                           </button>`
-                        : '';
+                           </button>` :
+                        '';
                     return `
                         <div style="background: rgba(255,255,255,${isLast ? '0.07' : '0.04'}); border-radius:8px; padding:1.1em 1.3em; margin-bottom:0.9em; border-left: 3px solid ${isLast ? '#00a4dc' : 'transparent'};">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:0.7em;">
@@ -220,11 +231,10 @@ export default function (view) {
                     `;
                 }).join('');
 
-                // Bind rollback buttons after DOM is set
                 historyList.querySelectorAll('.adminRollbackBtn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const ver = btn.dataset.version;
-                        if (confirm(`Roll back model to version "${ver}"?`)) {
+                        if (window.confirm(`Roll back model to version "${ver}"?`)) {
                             doRollback(ver, btn);
                         }
                     });
@@ -257,7 +267,6 @@ export default function (view) {
             });
     }
 
-    // ── ⑤ Schedule ──
     scheduleEnabled.addEventListener('change', () => {
         scheduleEnabledLabel.textContent = scheduleEnabled.checked ? 'Enabled' : 'Disabled';
     });
@@ -269,7 +278,7 @@ export default function (view) {
                 scheduleEnabled.checked = !!data.enabled;
                 scheduleEnabledLabel.textContent = data.enabled ? 'Enabled' : 'Disabled';
                 if (data.interval) scheduleInterval.value = data.interval;
-                if (data.time)     scheduleTime.value     = data.time;
+                if (data.time) scheduleTime.value = data.time;
             })
             .catch(err => console.warn('[admin] schedule error:', err));
     }
@@ -286,7 +295,9 @@ export default function (view) {
             .then(() => {
                 scheduleStatus.style.color = '#2ecc71';
                 scheduleStatus.textContent = '✓ Saved';
-                setTimeout(() => { scheduleStatus.textContent = ''; }, 3000);
+                setTimeout(() => {
+                    scheduleStatus.textContent = '';
+                }, 3000);
             })
             .catch(err => {
                 scheduleStatus.style.color = '#ff6b6b';
@@ -294,14 +305,16 @@ export default function (view) {
             });
     });
 
-    // ── Util ──
     function escHtml(s) {
         if (s == null) return '';
-        return String(s).replace(/[&<>"']/g, c =>
-            ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
-    // ── Page lifecycle ──
     view.addEventListener('viewshow', function () {
         loadStatus();
         loadDatasets();
