@@ -13,10 +13,15 @@ export default function (view) {
     const topNSelect = view.querySelector('.recTopNSelect');
     const refreshBtn = view.querySelector('.recRefreshBtn');
     const adminBtn = view.querySelector('.recAdminBtn');
-    const movieIdInput = view.querySelector('.recMovieIdInput');
+    const movieSearchInput = view.querySelector('.recMovieSearchInput');
+    const movieSearchResults = view.querySelector('.recMovieSearchResults');
+    const selectedMovieLabel = view.querySelector('.recSelectedMovieLabel');
     const durationInput = view.querySelector('.recDurationInput');
     const submitPrefBtn = view.querySelector('.recSubmitPrefBtn');
     const prefStatus = view.querySelector('.recPrefStatus');
+
+    let selectedMovieId = null;
+    let searchDebounceTimer = null;
 
     let currentUsername = null;
     let currentNumericUserId = null; // integer user_id returned by the API
@@ -120,7 +125,11 @@ export default function (view) {
                     <div class="recCardTitle" style="font-weight: 600; font-size: 0.92em; line-height: 1.35; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer; flex:1;">
                         ${escapeHtml(title)}
                     </div>
-                    ${genres ? `<div style="font-size: 0.72em; opacity: 0.5; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(genres)}</div>` : ''}
+                    ${genres ? `<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;">${
+                        genres.split(' · ').map(g =>
+                            `<span style="font-size: 0.68em; padding: 2px 7px; border-radius: 10px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.55); white-space: nowrap;">${escapeHtml(g)}</span>`
+                        ).join('')
+                    }</div>` : ''}
                     ${score ? `<div style="font-size: 0.82em; color: #FFD700; margin-top: 5px; font-weight: 700; text-shadow: 0 0 8px rgba(255,215,0,0.5);">★ ${score}</div>` : ''}
                     <button class="recLikeBtn"
                             style="margin-top: 10px; width: 100%; padding: 6px 0; border: 1px solid rgba(255,255,255,0.18); border-radius: 20px; background: transparent; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 0.8em; font-weight: 600; letter-spacing: 0.3px; transition: all 0.18s ease;">
@@ -200,16 +209,76 @@ export default function (view) {
         btn.style.background = 'rgba(46,204,113,0.1)';
     }
 
+    function searchMovies(q) {
+        if (!q || q.length < 2) {
+            movieSearchResults.style.display = 'none';
+            return;
+        }
+        fetch(`${REC_API_BASE}/api/search?q=${encodeURIComponent(q)}&limit=8`)
+            .then(r => r.json())
+            .then(data => {
+                const results = data.results || [];
+                if (!results.length) {
+                    movieSearchResults.style.display = 'none';
+                    return;
+                }
+                movieSearchResults.innerHTML = results.map(m =>
+                    `<div class="recSearchItem" data-id="${m.movie_id}" data-title="${escapeHtml(m.title)}"
+                          style="padding: 0.6em 1em; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.88em; transition: background 0.1s;">
+                        <span style="font-weight: 600;">${escapeHtml(m.title)}</span>
+                        <span style="opacity: 0.45; font-size: 0.85em; margin-left: 8px;">${escapeHtml(m.genres || '')}</span>
+                     </div>`
+                ).join('');
+                movieSearchResults.querySelectorAll('.recSearchItem').forEach(item => {
+                    item.addEventListener('mouseenter', () => {
+                        item.style.background = 'rgba(106,90,205,0.25)';
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        item.style.background = '';
+                    });
+                    item.addEventListener('click', () => {
+                        selectedMovieId = item.dataset.id;
+                        movieSearchInput.value = item.dataset.title;
+                        selectedMovieLabel.textContent = `ID: ${selectedMovieId}`;
+                        movieSearchResults.style.display = 'none';
+                    });
+                });
+                movieSearchResults.style.display = 'block';
+            })
+            .catch(() => {
+                movieSearchResults.style.display = 'none';
+            });
+    }
+
+    movieSearchInput.addEventListener('input', () => {
+        selectedMovieId = null;
+        selectedMovieLabel.textContent = '';
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => searchMovies(movieSearchInput.value.trim()), 280);
+    });
+
+    document.addEventListener('click', e => {
+        if (!movieSearchResults.contains(e.target) && e.target !== movieSearchInput) {
+            movieSearchResults.style.display = 'none';
+        }
+    });
+
     function handleSubmitPreference() {
         prefStatus.style.color = '';
         prefStatus.textContent = '';
 
-        const movieId = movieIdInput.value.trim();
         const duration = durationInput.value.trim();
 
-        if (!movieId || !duration) {
+        if (!selectedMovieId) {
             prefStatus.style.color = '#ff6b6b';
-            prefStatus.textContent = 'Fill in both Movie ID and Duration';
+            prefStatus.textContent = 'Search and select a movie first';
+            movieSearchInput.focus();
+            return;
+        }
+
+        if (!duration) {
+            prefStatus.style.color = '#ff6b6b';
+            prefStatus.textContent = 'Enter watch duration';
             return;
         }
 
@@ -227,7 +296,7 @@ export default function (view) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 user_id: currentNumericUserId,
-                movie_id: String(movieId),
+                movie_id: String(selectedMovieId),
                 watch_duration_seconds: parseInt(duration, 10)
             })
         })
@@ -243,7 +312,9 @@ export default function (view) {
             .then(() => {
                 prefStatus.style.color = '#2ecc71';
                 prefStatus.textContent = '✓ Submitted! Refresh to see updated recommendations.';
-                movieIdInput.value = '';
+                movieSearchInput.value = '';
+                selectedMovieId = null;
+                selectedMovieLabel.textContent = '';
                 durationInput.value = '';
                 setTimeout(() => {
                     prefStatus.textContent = '';

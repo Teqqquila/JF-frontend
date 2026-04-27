@@ -41,12 +41,19 @@
         </div>
 
         <!-- ── Submit Preference ── -->
-        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 1.2em; padding: 1em 1.4em; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(106,90,205,0.35);">
-            <div style="font-size: 0.78em; font-weight: 600; letter-spacing: 0.5px; color: #a990ff; white-space: nowrap; flex-shrink: 0;">SUBMIT PREFERENCE</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; flex: 1;">
-                <input type="number" class="recMovieIdInput emby-input" placeholder="Movie ID" style="width: 130px; border-radius: 8px;" min="1" max="290000">
-                <input type="number" class="recDurationInput emby-input" placeholder="Watch Duration (sec)" style="width: 185px; border-radius: 8px;" min="1" max="20000">
-                <button is="emby-button" type="button" class="recSubmitPrefBtn raised button-submit" style="border-radius: 8px; white-space: nowrap;">
+        <div style="margin-bottom: 1.2em; padding: 0.9em 1.4em; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(106,90,205,0.35);">
+            <div style="font-size: 0.78em; font-weight: 600; letter-spacing: 0.5px; color: #a990ff; margin-bottom: 0.6em;">SUBMIT PREFERENCE</div>
+            <!-- Single row: search | duration | submit | status -->
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                <div style="position: relative; flex: 2; min-width: 180px;">
+                    <input type="text" class="recMovieSearchInput emby-input" placeholder="Search movie title…" style="width: 100%; border-radius: 8px;" autocomplete="off">
+                    <div class="recMovieSearchResults"
+                         style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1a1a2e; border: 1px solid rgba(106,90,205,0.5); border-radius: 8px; max-height: 220px; overflow-y: auto; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+                    </div>
+                </div>
+                <span class="recSelectedMovieLabel" style="font-size: 0.75em; color: #a990ff; white-space: nowrap;"></span>
+                <input type="number" class="recDurationInput emby-input" placeholder="Duration (sec)" style="width: 140px; border-radius: 8px;" min="1" max="20000">
+                <button is="emby-button" type="button" class="recSubmitPrefBtn raised button-submit" style="border-radius: 8px; white-space: nowrap; flex-shrink: 0;">
                     <span>Submit</span>
                 </button>
                 <span class="recPrefStatus" style="font-size: 0.82em;"></span>
