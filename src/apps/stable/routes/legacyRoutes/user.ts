@@ -93,6 +93,12 @@ export const LEGACY_USER_ROUTES: LegacyRoute[] = [
             view: 'home.html'
         }
     }, {
+        path: 'recommend',
+        pageProps: {
+            controller: 'recommend/index',
+            view: 'recommend/index.html'
+        }
+    }, {
         path: 'movies',
         pageProps: {
             controller: 'movies/moviesrecommended',

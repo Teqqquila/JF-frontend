@@ -1,0 +1,65 @@
+<div id="recommendPage" data-role="page" class="page libraryPage noSecondaryNavPage" data-backbutton="true">
+    <div class="padded-left padded-right padded-bottom-page">
+
+        <!-- ── Hero header ── -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.8em 0 1.4em; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #00a4dc, #6a5acd); display: flex; align-items: center; justify-content: center; font-size: 1.3em; flex-shrink: 0;">⭐</div>
+                <div>
+                    <h1 style="margin: 0; font-size: 1.5em; font-weight: 700; line-height: 1;">Recommendations</h1>
+                    <div class="recUserBadge" style="font-size: 0.78em; opacity: 0.55; margin-top: 3px;"></div>
+                </div>
+            </div>
+            <button is="emby-button" type="button" class="recAdminBtn raised" style="border-radius: 20px;">
+                <span>⚙ Model Management</span>
+            </button>
+        </div>
+
+        <!-- ── Controls row ── -->
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 1em; padding: 1.1em 1.4em; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(0,164,220,0.22);">
+            <div style="flex: 2; min-width: 200px; max-width: 480px;">
+                <label style="display:block; font-size:0.72em; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; color:#00a4dc; margin-bottom:6px;">Model</label>
+                <select is="emby-select" class="recModelSelect emby-select" style="width: 100%;">
+                    <option value="latest" selected>latest  (MLP · recommended)</option>
+                    <option value="v0002">v0002  (MLP)</option>
+                    <option value="v0001">v0001  (MLP)</option>
+                    <option value="latest_lightgbm">latest  (LightGBM)</option>
+                    <option value="latest_mlp_large">latest  (MLP Large)</option>
+                </select>
+            </div>
+            <div style="min-width: 100px; max-width: 140px;">
+                <label style="display:block; font-size:0.72em; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; color:#00a4dc; margin-bottom:6px;">Top N</label>
+                <select is="emby-select" class="recTopNSelect emby-select" style="width: 100%;">
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+            <button is="emby-button" type="button" class="recRefreshBtn raised button-submit" style="border-radius: 8px; padding: 0 28px; height: 38px; flex-shrink: 0;">
+                <span>↻ Refresh</span>
+            </button>
+        </div>
+
+        <!-- ── Submit Preference ── -->
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 1.2em; padding: 1em 1.4em; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(106,90,205,0.35);">
+            <div style="font-size: 0.78em; font-weight: 600; letter-spacing: 0.5px; color: #a990ff; white-space: nowrap; flex-shrink: 0;">SUBMIT PREFERENCE</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; flex: 1;">
+                <input type="number" class="recMovieIdInput emby-input" placeholder="Movie ID" style="width: 130px; border-radius: 8px;" min="1" max="290000">
+                <input type="number" class="recDurationInput emby-input" placeholder="Watch Duration (sec)" style="width: 185px; border-radius: 8px;" min="1" max="20000">
+                <button is="emby-button" type="button" class="recSubmitPrefBtn raised button-submit" style="border-radius: 8px; white-space: nowrap;">
+                    <span>Submit</span>
+                </button>
+                <span class="recPrefStatus" style="font-size: 0.82em;"></span>
+            </div>
+        </div>
+
+        <!-- ── Status text ── -->
+        <div class="recStatus" style="font-size: 0.85em; opacity: 0.55; padding: 0.2em 0 0.9em; min-height: 1.4em;"></div>
+
+        <!-- ── Movie grid ── -->
+        <div class="recGrid itemsContainer vertical-wrap"
+             style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1.2em;">
+        </div>
+
+    </div>
+</div>

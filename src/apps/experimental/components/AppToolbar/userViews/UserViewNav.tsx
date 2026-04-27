@@ -132,9 +132,7 @@ const UserViewNav = () => {
                 color='inherit'
                 startIcon={<Star />}
                 component='a'
-                href='http://129.114.25.107:30089/'
-                target='_blank'
-                rel='noopener noreferrer'
+                href='#/recommend'
             >
                 Recommend
             </Button>

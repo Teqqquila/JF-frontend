@@ -1,0 +1,145 @@
+<div id="recommendAdminPage" data-role="page" class="page libraryPage noSecondaryNavPage" data-backbutton="true">
+    <div class="padded-left padded-right padded-bottom-page">
+
+        <!-- ── Header ── -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.6em 0 1.8em; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #6a5acd, #00a4dc); display: flex; align-items: center; justify-content: center; font-size: 1.2em; flex-shrink: 0;">⚙</div>
+                <div>
+                    <h1 style="margin: 0; font-size: 1.4em; font-weight: 700; line-height: 1;">Model Management</h1>
+                    <div style="font-size: 0.75em; opacity: 0.45; margin-top: 3px;">Recommendation engine · admin</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <span class="adminTrainingBadge" style="font-size: 0.8em; padding: 5px 14px; border-radius: 20px; background: rgba(46,204,113,0.15); color: #2ecc71; font-weight: 600; letter-spacing: 0.3px;">● Ready</span>
+                <button is="emby-button" type="button" class="adminBackBtn raised" style="border-radius: 20px;">
+                    <span>← Back</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Overview metric cards (full-width) ── -->
+        <section style="margin-bottom: 2em;">
+            <div style="font-size: 0.7em; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.4; margin-bottom: 0.9em;">Current Model</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1em;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1.2em 1.4em; border-left: 3px solid #6a5acd;">
+                    <div style="font-size: 0.7em; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5em;">Model Version</div>
+                    <div class="adminMetricVersion" style="font-size: 1.5em; font-weight: 700; color: #a990ff;">--</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1.2em 1.4em; border-left: 3px solid #00a4dc;">
+                    <div style="font-size: 0.7em; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5em;">Best Val MSE</div>
+                    <div class="adminMetricMse" style="font-size: 1.5em; font-weight: 700; color: #00a4dc;">--</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1.2em 1.4em; border-left: 3px solid #2ecc71;">
+                    <div style="font-size: 0.7em; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5em;">Hit Rate@10</div>
+                    <div class="adminMetricHitRate" style="font-size: 1.5em; font-weight: 700; color: #2ecc71;">--</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1.2em 1.4em; border-left: 3px solid #f39c12;">
+                    <div style="font-size: 0.7em; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5em;">NDCG@10</div>
+                    <div class="adminMetricNdcg" style="font-size: 1.5em; font-weight: 700; color: #f39c12;">--</div>
+                </div>
+            </div>
+        </section>
+
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.07); margin-bottom: 2em;">
+
+        <!-- ── Two-column body ── -->
+        <div style="display: flex; gap: 2em; align-items: flex-start; flex-wrap: wrap;">
+
+            <!-- ── Left sidebar (460px) ── -->
+            <div style="flex: 0 0 460px; min-width: 320px; display: flex; flex-direction: column; gap: 1.5em;">
+
+                <!-- Retrain Model -->
+                <section style="background: rgba(255,255,255,0.04); border-radius: 12px; padding: 1.4em; border: 1px solid rgba(255,255,255,0.07);">
+                    <div style="font-size: 0.7em; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.4; margin-bottom: 1.1em;">Retrain Model</div>
+                    <div style="margin-bottom: 1em;">
+                        <label style="display:block; font-size:0.8em; opacity:0.65; margin-bottom:5px;">Dataset Version</label>
+                        <select is="emby-select" class="adminDatasetSelect emby-select" style="width: 100%;">
+                            <option>Loading…</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 1.2em;">
+                        <label style="display:block; font-size:0.8em; opacity:0.65; margin-bottom:5px;">Base Model</label>
+                        <select is="emby-select" class="adminModelTypeSelect emby-select" style="width: 100%;">
+                            <option value="mlp">MLP (512-256-128)</option>
+                            <option value="mlp_large">MLP Large (1024-512-256-128)</option>
+                            <option value="lightgbm" disabled style="opacity:0.4;">LightGBM  (inference only)</option>
+                        </select>
+                    </div>
+                    <button is="emby-button" type="button" class="adminRetrainBtn raised button-submit" style="width: 100%; border-radius: 8px;">
+                        <span>⚡ Retrain Now</span>
+                    </button>
+                    <div class="adminRetrainStatus" style="font-size: 0.85em; min-height: 1.2em; margin-top: 0.8em;"></div>
+                </section>
+
+                <!-- Scheduled Retraining -->
+                <section style="background: rgba(255,255,255,0.04); border-radius: 12px; padding: 1.4em; border: 1px solid rgba(255,255,255,0.07);">
+                    <div style="font-size: 0.7em; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.4; margin-bottom: 1.1em;">Scheduled Retraining</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2em; padding-bottom: 1em; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                        <div>
+                            <div style="font-size: 0.9em; font-weight: 600;">Auto Retrain</div>
+                            <div style="font-size: 0.75em; opacity: 0.5; margin-top: 2px;">Trigger when new data arrives</div>
+                        </div>
+                        <label style="display:flex; align-items:center; gap: 8px; cursor: pointer; flex-shrink:0;">
+                            <input type="checkbox" class="adminScheduleEnabled" style="width:16px; height:16px; cursor:pointer; accent-color: #00a4dc;">
+                            <span class="adminScheduleEnabledLabel" style="font-size: 0.82em; min-width: 52px; color: rgba(255,255,255,0.5);">Disabled</span>
+                        </label>
+                    </div>
+                    <div style="margin-bottom: 1em;">
+                        <label style="display:block; font-size:0.8em; opacity:0.65; margin-bottom:5px;">Interval</label>
+                        <select is="emby-select" class="adminScheduleInterval emby-select" style="width: 100%;">
+                            <option value="hourly">Hourly</option>
+                            <option value="daily" selected>Daily</option>
+                            <option value="weekly">Weekly</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 1.3em;">
+                        <label style="display:block; font-size:0.8em; opacity:0.65; margin-bottom:5px;">Time (UTC)</label>
+                        <input type="time" class="adminScheduleTime" value="02:00"
+                               style="width:100%; box-sizing:border-box; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 7px; padding: 8px 12px; color: inherit; font-size: 0.9em; outline: none;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1em;">
+                        <button is="emby-button" type="button" class="adminSaveScheduleBtn raised button-submit" style="border-radius: 8px; flex: 1;">
+                            <span>Save</span>
+                        </button>
+                        <span class="adminScheduleStatus" style="font-size: 0.82em;"></span>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- ── Right column (Training Logs) ── -->
+            <div style="flex: 1; min-width: 280px;">
+                <section style="background: rgba(255,255,255,0.04); border-radius: 12px; padding: 1.4em; border: 1px solid rgba(255,255,255,0.07); height: 100%; box-sizing: border-box;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
+                        <div style="font-size: 0.7em; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.4;">Training Logs</div>
+                        <button is="emby-button" type="button" class="adminClearLogsBtn raised" style="border-radius: 6px; font-size: 0.8em; padding: 0 14px; height: 30px; color: #fff;">
+                            <span>Clear</span>
+                        </button>
+                    </div>
+                    <div class="adminLogBox"
+                         style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 1em 1.1em; font-family: 'JetBrains Mono','Fira Code','Cascadia Code',monospace; font-size: 0.78em; line-height: 1.9; height: 300px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.06);">
+                        <span style="opacity: 0.35;">No logs yet.</span>
+                    </div>
+                    <div style="margin-top: 1em;">
+                        <button is="emby-button" type="button" class="adminRetrainBtn2 raised button-submit" style="border-radius: 8px; padding: 0 24px;">
+                            <span>⚡ Start Retraining</span>
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+        </div><!-- end two-column -->
+
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 2em 0;">
+
+        <!-- ── Model History (full-width) ── -->
+        <section style="margin-bottom: 3em;">
+            <div style="font-size: 0.7em; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.4; margin-bottom: 1em;">Model History</div>
+            <div class="adminHistoryList">
+                <span style="opacity: 0.35; font-size: 0.9em;">Loading…</span>
+            </div>
+        </section>
+
+    </div>
+</div>

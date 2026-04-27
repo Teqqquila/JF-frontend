@@ -52,5 +52,17 @@ export const LEGACY_USER_ROUTES: LegacyRoute[] = [
             isNowPlayingBarEnabled: false,
             isThemeMediaSupported: true
         }
+    }, {
+        path: 'recommend',
+        pageProps: {
+            controller: 'recommend/index',
+            view: 'recommend/index.html'
+        }
+    }, {
+        path: 'recommend/admin',
+        pageProps: {
+            controller: 'recommend/admin/index',
+            view: 'recommend/admin/index.html'
+        }
     }
 ];
